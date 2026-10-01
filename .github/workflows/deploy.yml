@@ -5,13 +5,7 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-  workflow_dispatch: # Allows manual trigger if GCP secrets are configured
-
-env:
-  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-  GAR_LOCATION: europe-west1
-  REPOSITORY: sre-apps
-  IMAGE_NAME: resilient-flask-app
+  workflow_dispatch: # Allows manual cloud deployment trigger via GitHub UI
 
 jobs:
   # -----------------------------------------------------------
@@ -29,7 +23,7 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Syntax Check Python App
+      - name: Syntax Check Python App & Monitor
         run: |
           python -m py_compile app/app.py
           python -m py_compile monitor/remediator.py
@@ -56,13 +50,18 @@ jobs:
 
   # -----------------------------------------------------------
   # 2. CD Job: Build Image & Deploy via Terraform (Cloud Target)
-  # Runs only when GCP credentials are configured in repository secrets
+  # Triggered manually via Actions tab
   # -----------------------------------------------------------
   build-and-deploy:
     name: Build, Provision & Deploy
     needs: lint-and-validate
-    if: "${{ secrets.GCP_SA_KEY != '' && github.ref == 'refs/heads/main' }}"
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
+    env:
+      PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+      GAR_LOCATION: europe-west1
+      REPOSITORY: sre-apps
+      IMAGE_NAME: resilient-flask-app
 
     steps:
       - name: Checkout Code
