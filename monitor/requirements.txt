@@ -1,0 +1,4 @@
+requests==2.32.3
+google-cloud-run==0.10.5
+google-auth==2.32.0
+docker==7.1.0
