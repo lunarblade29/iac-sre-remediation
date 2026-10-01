@@ -34,8 +34,8 @@ resource "google_cloud_run_v2_service" "app_service" {
 
   template {
     scaling {
-      min_instance_count = 1  # Keep 1 warm instance so health checks never time out
-      max_instance_count = 3  # Cap it to avoid unexpected costs
+      min_instance_count = 1 # Keep 1 warm instance so health checks never time out
+      max_instance_count = 3 # Cap it to avoid unexpected costs
     }
 
     containers {
